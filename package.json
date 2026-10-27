@@ -1,0 +1,25 @@
+{
+  "name": "unisnap-poc",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "npm run typecheck && npm run build:app && npm run build:content",
+    "build:app": "vite build -c config/vite.config.ts",
+    "build:content": "CONTENT=main-world vite build -c config/vite.content.config.ts && CONTENT=bridge vite build -c config/vite.content.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0"
+  }
+}

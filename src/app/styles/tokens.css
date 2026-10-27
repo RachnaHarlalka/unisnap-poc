@@ -1,0 +1,59 @@
+/* Unisnap dashboard: a quiet, minimal workspace. One accent, hairline borders, an 8px rhythm. */
+:root {
+  --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* type scale */
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 22px;
+  --fs-stat: 26px;
+
+  /* surfaces */
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --border: #e6e6e9;
+  --text: #18181b;
+  --muted: #71717a;
+
+  /* one accent, three quiet signals */
+  --accent: #4338ca;
+  --accent-soft: #eef0ff;
+  --accent-text: #ffffff;
+  --good: #15803d;
+  --good-bg: #e8f5ec;
+  --warn: #a15c07;
+  --warn-bg: #fdf3e0;
+  --bad: #b42318;
+  --bad-bg: #fdecea;
+  --info: #3b45b5;
+  --info-bg: #eef0ff;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --side: 276px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e0f12;
+    --surface: #16181d;
+    --surface-2: #1b1e24;
+    --border: #272a32;
+    --text: #ececf0;
+    --muted: #9296a3;
+    --accent: #8b9bff;
+    --accent-soft: #1c2140;
+    --accent-text: #0e0f12;
+    --good: #5dd39e;
+    --good-bg: #14291f;
+    --warn: #f0b95a;
+    --warn-bg: #33270f;
+    --bad: #ff8d84;
+    --bad-bg: #371a17;
+    --info: #9fb0ff;
+    --info-bg: #1c2340;
+  }
+}

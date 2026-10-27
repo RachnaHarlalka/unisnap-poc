@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Unisnap POC",
+  "version": "0.0.1",
+  "description": "Throwaway POC: find cross-account Google Photos duplicates. Test accounts only.",
+  "action": {
+    "default_title": "Open Unisnap dashboard"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": [
+    "https://photos.google.com/*",
+    "https://*.googleusercontent.com/*",
+    "https://*.usercontent.google.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://photos.google.com/*"
+      ],
+      "js": [
+        "main-world.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://photos.google.com/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
