@@ -8,9 +8,8 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["chrome"],
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "types": ["chrome", "vite/client"],
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
 }

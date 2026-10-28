@@ -9,15 +9,15 @@ if (entry !== "main-world" && entry !== "bridge") {
 }
 
 export default defineConfig({
-  root: resolve(__dirname, ".."),
-  resolve: { alias: { "@": resolve(__dirname, "../src") } },
+  root: resolve(import.meta.dirname, ".."),
+  resolve: { alias: { "@": resolve(import.meta.dirname, "../src") } },
   // GPTK uses Tampermonkey's unsafeWindow; in the MAIN world it is just window.
   define: { unsafeWindow: "window" },
   build: {
     outDir: "dist",
     emptyOutDir: false,
     lib: {
-      entry: resolve(__dirname, `../src/content/${entry}.ts`),
+      entry: resolve(import.meta.dirname, `../src/content/${entry}.ts`),
       formats: ["iife"],
       name: `unisnap_${entry.replace("-", "_")}`,
       fileName: () => `${entry}.js`,
