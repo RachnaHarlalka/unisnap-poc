@@ -1,0 +1,18 @@
+{
+  "name": "@unisnap/engine",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Platform-independent matching engine: pure TypeScript, no DOM, no Chrome, no network.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
