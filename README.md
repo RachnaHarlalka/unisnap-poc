@@ -92,7 +92,7 @@ Imports use the `@/` alias for `src/`. Dependencies point one way: `app` → `se
 
 ## Not done yet
 
-No automated tests, no listing past one page of results (untested), no Stop button for a running batch, no file sizes or "space saved", and videos are not handled separately. See [docs/FINDINGS.md](docs/FINDINGS.md) for what is and is not verified.
+No automated tests, no listing past one page of results (untested), no Stop button for a running batch, no file sizes or "space saved", and videos are only flagged (never paired with photos, never bulk-marked) rather than compared properly. See [docs/FINDINGS.md](docs/FINDINGS.md) for what is and is not verified.
 
 ## Credits
 

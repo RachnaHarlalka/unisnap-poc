@@ -11,3 +11,12 @@ export const fmtDate = (t?: number) => (t ? LONG.format(t) : "no date");
 export const fmtShort = (t?: number) => (t ? SHORT.format(t) : "never");
 export const dims = (i: ItemRow) => (i.width && i.height ? `${i.width}×${i.height}` : "size unknown");
 export const keyOf = (i: ItemRow) => `${i.account}:${i.mediaKey}`;
+
+// GPTK only reports a duration for videos.
+export const isVideo = (i: ItemRow) => typeof i.duration === "number";
+
+export const fmtDuration = (ms?: number) => {
+  if (ms === undefined) return "";
+  const s = Math.round(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};

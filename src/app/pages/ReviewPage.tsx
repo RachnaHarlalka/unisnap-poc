@@ -7,7 +7,7 @@ import { MAX_BATCH } from "@/core/trash";
 import type { Group, GroupKind, KeepRule } from "@/core/groups";
 import { Pill } from "@/app/components/ui";
 import { KIND, refusal, selectable } from "@/app/viewmodel";
-import { dims, fmtCompact, keyOf } from "@/core/format";
+import { dims, fmtCompact, fmtDuration, isVideo, keyOf } from "@/core/format";
 import type { Scope, TrashUi } from "@/app/viewmodel";
 
 function GroupCard({ g, t, scope }: { g: Group; t: TrashUi; scope: Scope }) {
@@ -18,6 +18,7 @@ function GroupCard({ g, t, scope }: { g: Group; t: TrashUi; scope: Scope }) {
     <article className="group">
       <header className="ghead">
         <Pill tone={KIND[g.kind].tone}>{KIND[g.kind].name}</Pill>
+        {g.hasVideo && <Pill tone="">Video</Pill>}
         <span className="gtitle">
           {g.items.length} copies {scope === "within" && <span>· in {g.accounts[0]}</span>}
         </span>
@@ -49,6 +50,7 @@ function GroupCard({ g, t, scope }: { g: Group; t: TrashUi; scope: Scope }) {
               <span className={`tag ${checked ? "bad" : state === "keep" || state === "keeping" ? "good" : ""}`}>{tagText}</span>
               <figcaption>
                 {dims(it)}
+                {isVideo(it) && ` · ${fmtDuration(it.duration)}`}
                 <br />
                 {fmtCompact(it.captureTime)}
               </figcaption>
@@ -108,8 +110,9 @@ export function ReviewPage({ rows, t, scope, setScope, filter, setFilter }: Prop
   const inScope = groups.filter((g) => isAcross(g) === (scope === "across"));
   const count = (k: GroupKind) => inScope.filter((g) => g.kind === k).length;
   const shown = inScope.filter((g) => filter === "all" || g.kind === filter);
-  // The bulk button skips Burst groups (different shots that only look alike) unless the Burst filter is open.
-  const eligible = shown.filter((g) => g.kind !== "burst" || filter === "burst");
+  // The bulk button only takes strong evidence: Exact and Similar groups. Looks-alike and Burst groups (probably different
+  // photos) are marked only when that filter is open on purpose, and groups with a video are never part of it.
+  const eligible = shown.filter((g) => !g.hasVideo && (g.kind === "exact" || g.kind === "similar" || filter === g.kind));
   const eligibleCount = eligible.reduce((n, g) => n + selectable(g, t.items, t.keepOf(g)).length, 0);
 
   if (!rows?.length) {
@@ -140,7 +143,7 @@ export function ReviewPage({ rows, t, scope, setScope, filter, setFilter }: Prop
       </div>
 
       <div className="filters">
-        {(["all", "exact", "similar", "burst"] as const).map((k) => (
+        {(["all", "exact", "similar", "alike", "burst"] as const).map((k) => (
           <button key={k} className={`chip ${filter === k ? "active" : ""}`} onClick={() => setFilter(k)}>
             {k === "all" ? "All" : KIND[k].name}
             <span>{k === "all" ? inScope.length : count(k)}</span>
@@ -162,8 +165,8 @@ export function ReviewPage({ rows, t, scope, setScope, filter, setFilter }: Prop
                 ))}
               </select>
             </span>
-            <span className="muted" title="Burst groups are different shots that only look alike, so they are skipped unless you open the Burst filter.">
-              in every group{filter !== "burst" && count("burst") > 0 ? " · skips Burst" : ""}
+            <span className="muted" title="Looks-alike and Burst groups are probably different photos, and groups with a video are never bulk-marked. Open those filters to handle them by hand.">
+              in every group{filter !== "alike" && filter !== "burst" && count("alike") + count("burst") > 0 ? " · skips Looks alike and Burst" : ""}
             </span>
           </div>
           <button

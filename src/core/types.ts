@@ -17,6 +17,7 @@ export interface ItemRow {
   isFavorite?: boolean;
   isArchived?: boolean;
   isLivePhoto?: boolean;
+  duration?: number; // ms, present only for videos
   dhash?: string;
 }
 

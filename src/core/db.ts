@@ -40,6 +40,7 @@ export function toRow(account: Label, r: RawItem): ItemRow {
     isFavorite: r.isFavorite,
     isArchived: r.isArchived,
     isLivePhoto: r.isLivePhoto,
+    duration: r.duration,
   };
 }
 

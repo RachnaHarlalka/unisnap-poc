@@ -1,5 +1,6 @@
 import type { Label } from "./types";
 import type { ItemRow } from "./types";
+import { isVideo } from "./format";
 import { classify } from "./matching";
 import type { Row } from "./matching";
 
@@ -9,7 +10,9 @@ import type { Row } from "./matching";
 // rule alone is not safe for real libraries.
 export const BURST_MIN_GAP_MS = 50;
 
-export type GroupKind = "exact" | "similar" | "burst";
+// exact: same file. similar: the same photo, resized or re-saved. alike: looks alike but the evidence is weak, so a person
+// must check. burst: different frames taken close together.
+export type GroupKind = "exact" | "similar" | "alike" | "burst";
 
 export interface Group {
   id: string;
@@ -19,6 +22,7 @@ export interface Group {
   maxGapMs: number;
   keep: ItemRow; // suggestion only, nothing is deleted in the POC
   accounts: Label[]; // one entry = duplicates inside a single account
+  hasVideo: boolean; // video groups are never part of a bulk mark
 }
 
 const key = (i: ItemRow) => `${i.account}:${i.mediaKey}`;
@@ -55,7 +59,12 @@ export function buildGroups(rows: Row[]): Group[] {
   const groups: Group[] = [...comps.entries()].map(([id, g]) => {
     const allExact = g.edges.every((r) => classify(r) === "exact");
     const maxGapMs = Math.max(...g.edges.map((r) => r.c.deltaMs));
-    const kind: GroupKind = allExact ? "exact" : g.edges.some((r) => classify(r) !== "exact" && r.c.deltaMs > BURST_MIN_GAP_MS) ? "burst" : "similar";
+    // Only strong evidence makes a group "similar": every non-exact pair within 6 bits, the same capture time,
+    // and a capture time that actually means something. Anything weaker is left for a person to judge.
+    const nonExact = g.edges.filter((r) => classify(r) !== "exact");
+    const burst = nonExact.some((r) => r.c.deltaMs > BURST_MIN_GAP_MS);
+    const weak = nonExact.some((r) => classify(r) !== "near" || !r.c.timeTrusted);
+    const kind: GroupKind = allExact ? "exact" : burst ? "burst" : weak ? "alike" : "similar";
     const keep = [...g.items].sort((x, y) => pixels(y) - pixels(x) || (x.uploadTime ?? 0) - (y.uploadTime ?? 0))[0];
     return {
       id,
@@ -65,9 +74,10 @@ export function buildGroups(rows: Row[]): Group[] {
       maxGapMs,
       keep,
       accounts: [...new Set(g.items.map((i) => i.account))].sort() as Label[],
+      hasVideo: g.items.some(isVideo),
     };
   });
-  const order: Record<GroupKind, number> = { exact: 0, similar: 1, burst: 2 };
+  const order: Record<GroupKind, number> = { exact: 0, similar: 1, alike: 2, burst: 3 };
   return groups.sort((a, b) => order[a.kind] - order[b.kind] || b.items.length - a.items.length);
 }
 

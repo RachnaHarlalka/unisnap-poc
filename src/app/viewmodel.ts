@@ -11,6 +11,7 @@ export type Scope = "across" | "within";
 export const KIND: Record<GroupKind, { name: string; hint: string; tone: Tone }> = {
   exact: { name: "Exact", hint: "Identical file", tone: "good" },
   similar: { name: "Similar", hint: "Same photo, resized or re-saved", tone: "info" },
+  alike: { name: "Looks alike", hint: "Weak evidence: probably different photos, check each one", tone: "warn" },
   burst: { name: "Burst", hint: "Different frames taken close together", tone: "warn" },
 };
 

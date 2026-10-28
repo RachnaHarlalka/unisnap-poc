@@ -47,6 +47,19 @@ Distances are Hamming bits out of 64, from the dashboard's own export.
 
 **Tuning to try next:** a larger hash (for example 16 by 16, 256 bits) or PDQ on the same 55 pairs, to see if distances for copies and look-alikes stop overlapping; then decide whether capture time is needed at all.
 
+## First look at a real library (28 Oct)
+
+Running the tool on real libraries (about 2300 photos) showed two problems the seed data could not:
+
+- **False "Similar" groups.** Several different photos of the same person (different outfits, same room) were grouped as Similar at 12 of 64 bits and 0 ms apart. All had an identical capture time, which is what photos with no real capture time get (screenshots, chat photos, imports). A shared stamp is not evidence, and 12 bits is too loose for "the same photo".
+- **Videos** were handled as photos, using one poster frame, and the duration was never stored.
+
+Fixes applied:
+- "Similar" now needs every non-exact pair within 6 bits **and** a capture time that means something. A time shared by 3 or more photos in one account is treated as unknown.
+- Anything weaker, including 7 to 12 bits, is a new **Looks alike** group: shown for review, never part of the bulk mark.
+- The video duration is stored. A video is never paired with a photo, two videos must be within 1 s of each other in length, and any group with a video is excluded from the bulk mark. Videos are flagged with a badge and their length.
+- Checked on made-up cases covering shared timestamps, 9-bit pairs, bursts, exact copies and video pairing. Existing saved items have no duration until the libraries are scanned again.
+
 ## Not yet verified
 
 These were not measured, so the report does not claim them:

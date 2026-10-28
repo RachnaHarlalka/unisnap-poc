@@ -68,6 +68,7 @@ export interface RawItem {
   isFavorite?: boolean;
   isLivePhoto?: boolean;
   isOwned?: boolean;
+  duration?: number; // ms, present only for videos
   geoLocation?: unknown;
 }
 
