@@ -12,15 +12,15 @@ Google's official Photos APIs do not let an outside app read a whole library, so
 
 ```bash
 git submodule update --init      # fetches vendor/gptk
-npm install
-npm run build                    # writes the extension to dist/
+pnpm install
+pnpm run build                    # writes the extension to dist/
 ```
 
 1. Open `chrome://extensions`, turn on Developer mode, choose **Load unpacked**, pick the `dist/` folder.
 2. In **one Chrome profile**, sign in to two test Google accounts (first one is `/u/0/`, second is `/u/1/`).
 3. Click the extension icon to open the dashboard, then follow the three steps in the sidebar: **Connect accounts**, **Scan libraries**, **Find duplicates**.
 
-After every `npm run build`: reload the extension on `chrome://extensions`, **then reload any open Google Photos tabs**. The dashboard reads fresh files on reload, but the scripts inside a Photos tab only update when that tab reloads.
+After every `pnpm run build`: reload the extension on `chrome://extensions`, **then reload any open Google Photos tabs**. The dashboard reads fresh files on reload, but the scripts inside a Photos tab only update when that tab reloads.
 
 ### Test photos
 
@@ -85,10 +85,10 @@ Imports use the `@/` alias for `src/`. Dependencies point one way: `app` → `se
 
 | Command | What it does |
 | --- | --- |
-| `npm run build` | Type-check, then build everything into `dist/` |
-| `npm run typecheck` | Type-check only |
-| `npm run build:app` | Dashboard and service worker |
-| `npm run build:content` | The two content scripts (single-file builds) |
+| `pnpm run build` | Type-check, then build everything into `dist/` |
+| `pnpm run typecheck` | Type-check only |
+| `pnpm run build:app` | Dashboard and service worker |
+| `pnpm run build:content` | The two content scripts (single-file builds) |
 
 ## Not done yet
 
