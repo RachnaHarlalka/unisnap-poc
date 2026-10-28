@@ -20,7 +20,7 @@ let loadError: string | undefined;
 // a page without that global must still answer "ping" with a useful error.
 async function loadGptk(): Promise<void> {
   try {
-    const mod = await import("../../vendor/gptk/src/api/api");
+    const mod = await import("../../../../vendor/gptk/src/api/api");
     api = new mod.default() as unknown as GptkApi;
     (window as unknown as { __unisnapApi?: GptkApi }).__unisnapApi = api;
   } catch (e) {

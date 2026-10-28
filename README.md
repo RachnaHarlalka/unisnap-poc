@@ -13,10 +13,10 @@ Google's official Photos APIs do not let an outside app read a whole library, so
 ```bash
 git submodule update --init      # fetches vendor/gptk
 pnpm install
-pnpm run build                    # writes the extension to dist/
+pnpm run build                    # writes the extension to apps/extension/dist/
 ```
 
-1. Open `chrome://extensions`, turn on Developer mode, choose **Load unpacked**, pick the `dist/` folder.
+1. Open `chrome://extensions`, turn on Developer mode, choose **Load unpacked**, pick the `apps/extension/dist/` folder.
 2. In **one Chrome profile**, sign in to two test Google accounts (first one is `/u/0/`, second is `/u/1/`).
 3. Click the extension icon to open the dashboard, then follow the three steps in the sidebar: **Connect accounts**, **Scan libraries**, **Find duplicates**.
 
@@ -50,8 +50,11 @@ Matching, in order: Google's own file key (`dedupKey`) finds identical files; ca
 
 ## Project layout
 
+The repo is a pnpm workspace (`apps/*`, `packages/*`). Everything below currently lives in `apps/extension/`; the engine and adapter packages are added in later steps (see ARCHITECTURE_AUDIT.md).
+
 ```
-src/
+apps/extension/
+  src/
   background/     service worker: opens the dashboard when the icon is clicked
   content/        main-world.ts (runs GPTK in the page) and bridge.ts (relay)
   shared/         protocol.ts: the messages and types the parts exchange
@@ -85,7 +88,8 @@ Imports use the `@/` alias for `src/`. Dependencies point one way: `app` → `se
 
 | Command | What it does |
 | --- | --- |
-| `pnpm run build` | Type-check, then build everything into `dist/` |
+| `pnpm run build` | Type-check, then build everything into `apps/extension/dist/` |
+| `pnpm test` | Run the unit tests (Vitest) |
 | `pnpm run typecheck` | Type-check only |
 | `pnpm run build:app` | Dashboard and service worker |
 | `pnpm run build:content` | The two content scripts (single-file builds) |
