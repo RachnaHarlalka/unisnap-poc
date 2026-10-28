@@ -24,4 +24,6 @@ Recorded on `main` at commit `7780142` (plus pnpm, which changes no code). Re-ru
 | Groups containing a video | | | | | | | |
 | Suggested keep for the largest group (account + mediaKey) | | | | | | | |
 
+Timings: every run also writes a report file (see [PERFORMANCE.md](PERFORMANCE.md)). Keep the first scan, Find duplicates and any trash report from the baseline run in `docs/perf/`, and use them to compare later changes.
+
 Optional, once, on a test account only: move one copy to Trash and restore it; all five checks on the Trash page should be green.

@@ -1,3 +1,5 @@
+import { timed } from "@unisnap/engine";
+import type { Recorder } from "@unisnap/engine";
 import { putItems } from "./db";
 import { thumbSrc } from "./thumbnail";
 import type { ItemRow } from "./types";
@@ -42,13 +44,15 @@ const hashBlob = (blob: Blob) =>
   });
 
 // Fetch the ~256px thumbnail with the extension's host permission, hash it in the worker, cache in IndexedDB.
-export async function fingerprint(item: ItemRow): Promise<string> {
+export async function fingerprint(item: ItemRow, run?: Recorder): Promise<string> {
   if (item.dhash) return item.dhash;
   if (!item.thumbUrl) throw new Error("item has no thumbnail URL");
-  const res = await fetch(thumbSrc(item.thumbUrl, FP_PX), { credentials: "include" });
+  const url = item.thumbUrl;
+  const res = await timed(run, "fetch-thumbnail", () => fetch(thumbSrc(url, FP_PX), { credentials: "include" }));
   if (!res.ok) throw new Error(`thumbnail HTTP ${res.status}`);
-  const hash = await hashBlob(await res.blob());
+  const blob = await timed(run, "read-body", () => res.blob());
+  const hash = await timed(run, "hash", () => hashBlob(blob));
   item.dhash = hash;
-  await putItems([item]);
+  await timed(run, "db-write", () => putItems([item]));
   return hash;
 }

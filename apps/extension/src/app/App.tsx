@@ -14,6 +14,7 @@ import { refusal, selectable } from "./viewmodel";
 import { dims, fmtShort, keyOf } from "@/core/format";
 import type { Flow, Page, Scope, TrashUi } from "./viewmodel";
 import { useUnisnap } from "@/app/hooks/useUnisnap";
+import { measureUi } from "@/perf";
 import { classify } from "@/core/matching";
 
 const TITLES: Record<Page, { title: string; sub: string }> = {
@@ -59,7 +60,7 @@ export function App() {
   ).size;
   const real = u.journal.filter((e) => !entryFailed(e));
 
-  const groups = buildGroups(rows);
+  const groups = measureUi("buildGroups", () => buildGroups(rows));
   const chosen = groups.flatMap((g) => g.items).filter((i) => selected.has(keyOf(i)));
 
   // Selection: always leave at least one copy of every group unmarked.

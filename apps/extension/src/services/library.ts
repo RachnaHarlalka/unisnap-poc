@@ -1,3 +1,5 @@
+import { timed } from "@unisnap/engine";
+import type { Recorder } from "@unisnap/engine";
 import { sendToTab } from "./tabs";
 import { clearAccount, listAccountItems, putItems, toRow } from "@/core/db";
 import type { Label } from "@/core/types";
@@ -18,43 +20,46 @@ export interface Progress {
 
 // Pages one tab at a time: one request in flight, a short pause between pages,
 // exponential backoff on errors, stop after repeated failures. Read-only.
-export async function listLibrary(label: Label, tabId: number, onProgress: (p: Progress) => void): Promise<Progress> {
+export async function listLibrary(label: Label, tabId: number, onProgress: (p: Progress) => void, run?: Recorder): Promise<Progress> {
   const t0 = Date.now();
   const p: Progress = { pages: 0, items: 0, retries: 0, ms: 0, done: false };
   // A re-list replaces what was stored, but fingerprints already computed are kept (by mediaKey),
   // so a rescan never makes the comparison step redo work it has already done.
-  const known = new Map((await listAccountItems(label)).map((r) => [r.mediaKey, r.dhash]));
-  await clearAccount(label);
+  const known = new Map((await timed(run, "load-known", () => listAccountItems(label))).map((r) => [r.mediaKey, r.dhash]));
+  await timed(run, "clear-account", () => clearAccount(label));
   let pageId: string | null = null;
   let failures = 0;
   let loggedRaw = false;
 
   while (true) {
     try {
-      const page: ListPageResult = await sendToTab<ListPageResult>(tabId, "listPage", { pageId });
+      const page: ListPageResult = await timed(run, "page-request", () => sendToTab<ListPageResult>(tabId, "listPage", { pageId }));
       failures = 0;
       if (!loggedRaw && page.items[0]) {
         console.log(`[Unisnap] raw item, account ${label}:`, page.items[0]);
         loggedRaw = true;
       }
-      await putItems(page.items.map((r) => ({ ...toRow(label, r), dhash: known.get(r.mediaKey) })));
+      await timed(run, "db-write", () => putItems(page.items.map((r) => ({ ...toRow(label, r), dhash: known.get(r.mediaKey) }))));
       p.pages++;
       p.items += page.items.length;
+      run?.count("pages");
+      run?.count("items", page.items.length);
       p.ms = Date.now() - t0;
       onProgress({ ...p });
       if (!page.nextPageId) break;
       pageId = page.nextPageId;
-      await sleep(PAUSE_MS);
+      await timed(run, "pause", () => sleep(PAUSE_MS));
     } catch (e) {
       failures++;
       p.retries++;
+      run?.count("retries");
       if (failures > MAX_RETRIES) {
         p.error = `Stopped after ${MAX_RETRIES} failed retries on page ${p.pages + 1}: ${e instanceof Error ? e.message : String(e)}`;
         p.ms = Date.now() - t0;
       onProgress({ ...p });
         return p;
       }
-      await sleep(2000 * 2 ** (failures - 1));
+      await timed(run, "retry-wait", () => sleep(2000 * 2 ** (failures - 1)));
     }
   }
   p.done = true;
