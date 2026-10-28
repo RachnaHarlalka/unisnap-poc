@@ -8,7 +8,8 @@
     "build": "pnpm run typecheck && pnpm run build:app && pnpm run build:content",
     "build:app": "vite build -c config/vite.config.ts",
     "build:content": "CONTENT=main-world vite build -c config/vite.content.config.ts && CONTENT=bridge vite build -c config/vite.content.config.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -21,6 +22,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.5.4",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "vitest": "^2.1.9"
   }
 }
